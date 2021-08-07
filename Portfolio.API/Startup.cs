@@ -33,6 +33,16 @@ namespace Portfolio.API
                 x.ReportApiVersions = true;
                 x.ApiVersionReader = new Microsoft.AspNetCore.Mvc.Versioning.HeaderApiVersionReader("x-frapper-api-version");
             });
+            services.AddVersionedApiExplorer(
+                options =>
+                {
+                    // add the versioned api explorer, which also adds IApiVersionDescriptionProvider service
+                    // note: the specified format code will format the version as "'v'major[.minor][-status]"
+                    options.GroupNameFormat = "'v'VVV";
+                    // note: this option is only necessary when versioning by url segment. the SubstitutionFormat
+                    // can also be used to control the format of the API version in route templates
+                    options.SubstituteApiVersionInUrl = true;
+                });
             /*api versioning-end*/
             /*Register the Swagger generator-start*/
             //services.AddSwaggerGen();
@@ -55,6 +65,7 @@ namespace Portfolio.API
             /*specify the Swagger JSON endpoint-start*/
             app.UseSwaggerUI(c =>
             {
+                c.DefaultModelsExpandDepth(-1);
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API v1");
                 c.SwaggerEndpoint("/swagger/v2/swagger.json", "My API v2");
             });
