@@ -5,27 +5,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Portfolio.API.Controllers.V2
+namespace Portfolio.API.Controllers.V1
 {
-    [ApiVersion("2.0")]
+    [Route("api/WeatherForecast")]
+    [ControllerName("WeatherForecastV1")]
+    [ApiVersion("1.0",Deprecated =true)]
     [ApiController]
-    [Route("[controller]")]
-    public class WeatherForecast2Controller : ControllerBase
+    //[Route("[controller]")]
+    public class WeatherForecastV1Controller : ControllerBase
     {
         private static readonly string[] Summaries = new[]
         {
-            "Freezing2", "Bracing2", "Chilly2", "Cool2", "Mild2", "Warm2", "Balmy2", "Hot2", "Sweltering2", "Scorching2"
+            "Freezing1", "Bracing1", "Chilly1", "Cool1", "Mild1", "Warm1", "Balmy1", "Hot1", "Sweltering1", "Scorching1"
         };
 
-        private readonly ILogger<WeatherForecast2Controller> _logger;
+        private readonly ILogger<WeatherForecastV1Controller> _logger;
 
-        public WeatherForecast2Controller(ILogger<WeatherForecast2Controller> logger)
+        public WeatherForecastV1Controller(ILogger<WeatherForecastV1Controller> logger)
         {
             _logger = logger;
         }
 
         [HttpGet]
-        [MapToApiVersion("2.0")]
+        [MapToApiVersion("1.0")]
         public IEnumerable<WeatherForecast> Get()
         {
             var rng = new Random();
