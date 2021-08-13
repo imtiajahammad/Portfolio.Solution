@@ -12,6 +12,7 @@ namespace Portfolio.API.Controllers.V2
     [ApiVersion("2.0")]
     [ApiController]
     //[Route("[controller]")]
+    [Microsoft.AspNetCore.Authorization.Authorize]
     public class WeatherForecastV2Controller : ControllerBase
     {
         private static readonly string[] Summaries = new[]

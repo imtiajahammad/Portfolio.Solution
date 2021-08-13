@@ -11,7 +11,7 @@ namespace Portfolio.API.Controllers.V1
     [ControllerName("WeatherForecastV1")]
     [ApiVersion("1.0",Deprecated =true)]
     [ApiController]
-    //[Route("[controller]")]
+    [Microsoft.AspNetCore.Authorization.Authorize]
     public class WeatherForecastV1Controller : ControllerBase
     {
         private static readonly string[] Summaries = new[]
