@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -6,9 +7,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Portfolio.API
@@ -26,6 +30,34 @@ namespace Portfolio.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            /*jwt authentication-start*/
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+               .AddJwtBearer(options =>
+               {
+                   options.TokenValidationParameters = new TokenValidationParameters
+                   {
+                       ValidateIssuer = true,
+                       ValidateAudience = true,
+                       ValidateLifetime = true,
+                       ValidateIssuerSigningKey = true,
+                       ValidIssuer = Configuration["ApplicationSettings:Issuer"],
+                       ValidAudience = Configuration["ApplicationSettings:Audience"],
+                       IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["ApplicationSettings:SecretKey"]))
+                   };
+
+                   options.Events = new JwtBearerEvents
+                   {
+                       OnAuthenticationFailed = context =>
+                       {
+                           if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                           {
+                               context.Response.Headers.Add("Token-Expired", "true");
+                           }
+                           return Task.CompletedTask;
+                       }
+                   };
+               });
+            /*jwt authentication-end*/
             /*api versioning-start*/
             services.AddApiVersioning(x=> {
                 x.DefaultApiVersion = new ApiVersion(1, 0);
@@ -51,6 +83,29 @@ namespace Portfolio.API
                 {
                     options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "My API", Version = "v1" });
                     options.SwaggerDoc("v2", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "My API", Version = "v2" });
+                    /*jwt portion-start*/
+                    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                    {
+                        In = ParameterLocation.Header,
+                        Description = "Please insert JWT with Bearer into field",
+                        Name = "Authorization",
+                        Type = SecuritySchemeType.ApiKey
+                    });
+                    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                    {
+                       {
+                        new OpenApiSecurityScheme
+                        {
+                          Reference = new OpenApiReference
+                          {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                          }
+                         },
+                         new string[] { }
+                       }
+                      });
+                    /*jwt portion-end*/
                 }
                 );
             /*Register the Swagger generator-end*/
@@ -75,9 +130,11 @@ namespace Portfolio.API
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
