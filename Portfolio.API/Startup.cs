@@ -120,6 +120,7 @@ namespace Portfolio.API
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseExceptionMiddleware();
 
             app.UseHttpsRedirection();
 
