@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Portfolio.API.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -137,6 +138,9 @@ namespace Portfolio.API
             app.UseAuthentication();
 
             app.UseAuthorization();
+
+            //Add our new middleware to the pipeline
+            app.UseMiddleware<RequestResponseLoggingMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {
