@@ -31,7 +31,7 @@ namespace Portfolio.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            /*jwt authentication-start*/
+            #region jwt authentication-start
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                .AddJwtBearer(options =>
                {
@@ -58,8 +58,8 @@ namespace Portfolio.API
                        }
                    };
                });
-            /*jwt authentication-end*/
-            /*api versioning-start*/
+            #endregion jwt authentication-end
+            #region api versioning-start
             services.AddApiVersioning(x=> {
                 x.DefaultApiVersion = new ApiVersion(1, 0);
                 x.AssumeDefaultVersionWhenUnspecified = true;
@@ -76,15 +76,15 @@ namespace Portfolio.API
                     // can also be used to control the format of the API version in route templates
                     options.SubstituteApiVersionInUrl = true;
                 });
-            /*api versioning-end*/
-            /*Register the Swagger generator-start*/
+            #endregion api versioning-end
+            #region Register the Swagger generator-start
             //services.AddSwaggerGen();
             services.AddSwaggerGen(
                 (options)=> 
                 {
                     options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "My API", Version = "v1" });
                     options.SwaggerDoc("v2", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "My API", Version = "v2" });
-                    /*jwt portion-start*/
+                    #region jwt portion-start
                     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                     {
                         In = ParameterLocation.Header,
@@ -106,42 +106,49 @@ namespace Portfolio.API
                          new string[] { }
                        }
                       });
-                    /*jwt portion-end*/
+                    #endregion jwt portion-end
                 }
                 );
-            /*Register the Swagger generator-end*/
+                #endregion Register the Swagger generator-end
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            /*Enable middleware to serve generated Swagger as a JSON endpoint-start*/
+            
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+            app.UseHttpsRedirection();
+
+            app.UseRouting();
+            #region Enable middleware to serve generated Swagger as a JSON endpoint-start*/
             app.UseSwagger();
-            /*Enable middleware to serve generated Swagger as a JSON endpoint-end*/
-            /*specify the Swagger JSON endpoint-start*/
+            #endregion Enable middleware to serve generated Swagger as a JSON endpoint-end
+            #region specify the Swagger JSON endpoint-start
             app.UseSwaggerUI(c =>
             {
                 c.DefaultModelsExpandDepth(-1);
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API v1");
                 c.SwaggerEndpoint("/swagger/v2/swagger.json", "My API v2");
             });
-            /*specify the Swagger JSON endpoint-end*/
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            #endregion specify the Swagger JSON endpoint-end
+            app.UseStaticFiles();
 
-            //app.UseHttpsRedirection();
+            #region Add our new middleware to the pipeline to validate request header
+            app.UseMiddleware<ValidateHeaderMiddleware>();
+            #endregion Add our new middleware to the pipeline to validate request header
 
-            app.UseRouting();
 
             app.UseAuthentication();
 
             app.UseAuthorization();
 
-            //Add our new middleware to the pipeline
+            #region Add our new middleware to the pipeline to log request and response
             app.UseMiddleware<RequestResponseLoggingMiddleware>();
-
+            #endregion Add our new middleware to the pipeline to log request and response
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
