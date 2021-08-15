@@ -29,16 +29,21 @@ namespace Portfolio.API.Controllers.V2
 
         [HttpGet]
         [MapToApiVersion("2.0")]
-        public IEnumerable<WeatherForecast> Get()
+        public IActionResult Get()
         {
             var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            List<WeatherForecast> aa = Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateTime.Now.AddDays(index),
                 TemperatureC = rng.Next(-20, 55),
                 Summary = Summaries[rng.Next(Summaries.Length)]
             })
-            .ToArray();
+            .ToList();
+            Helpers.StatusResult<List<WeatherForecast>> status = new Helpers.StatusResult<List<WeatherForecast>>();
+            status.Message = "Fetch Successful";
+            status.Result = aa;
+            status.Status = Portfolio.API.Helpers.ResponseStatus.FetchSuccess;
+            return Ok(status);
         }
     }
 }

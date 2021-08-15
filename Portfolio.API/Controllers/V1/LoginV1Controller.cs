@@ -33,8 +33,12 @@ namespace Portfolio.API.Controllers.V1
         [HttpPost]
         public IActionResult Authenticate(string username,string password)
         {
+            Helpers.StatusResult<string> status = new Helpers.StatusResult<string>();
             var response = GenerateJwtToken(1,1, "admin");
-            return Ok(response);
+            status.Message = "Login Successful";
+            status.Result = response;
+            status.Status = Portfolio.API.Helpers.ResponseStatus.LoginSuccess;
+            return Ok(status);
         }
         private string GenerateJwtToken(int UserId,int RoleId,string RoleName)
         {
