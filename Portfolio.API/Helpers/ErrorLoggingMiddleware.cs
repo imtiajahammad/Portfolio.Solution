@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -12,11 +13,11 @@ namespace Portfolio.API.Helpers
     public class ErrorLoggingMiddleware
     {
         private readonly RequestDelegate _next;
-        //private readonly ILogger _logger;
-        public ErrorLoggingMiddleware(RequestDelegate next/*, ILoggerFactory loggerFactory*/)
+        private readonly ILogger _logger;
+        public ErrorLoggingMiddleware(RequestDelegate next, ILoggerFactory loggerFactory)
         {
             _next = next;
-            //_logger = loggerFactory.CreateLogger<RequestResponseLoggingMiddleware>();
+            _logger = loggerFactory.CreateLogger<RequestResponseLoggingMiddleware>();
         }
 
         public async Task Invoke(HttpContext context)
@@ -27,7 +28,7 @@ namespace Portfolio.API.Helpers
             }
             catch (Exception exception)
             {
-                //_logger.LogError(exception, "Exception Caught in Exception Middleware");
+                _logger.LogError(exception, "Exception Caught in Exception Middleware");
 
                 var response = context.Response;
                 response.ContentType = "application/json";
@@ -53,7 +54,7 @@ namespace Portfolio.API.Helpers
             }
 
 
-        }
+         }
     }
     public class AppException : Exception
     {

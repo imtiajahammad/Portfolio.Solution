@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -19,10 +20,13 @@ namespace Portfolio.API.Controllers.V1
     //[ApiExplorerSettings(IgnoreApi = true)]// Hiding Login Api from Swagger documenation 
     public class LoginV1Controller : ControllerBase
     {
+        private readonly ILogger _logger;
+
         private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
-        public LoginV1Controller(Microsoft.Extensions.Configuration.IConfiguration configuration)
+        public LoginV1Controller(Microsoft.Extensions.Configuration.IConfiguration configuration, ILogger<LoginV1Controller> logger)
         {
             this._configuration = configuration;
+            _logger = logger;
         }
 
 
@@ -33,6 +37,7 @@ namespace Portfolio.API.Controllers.V1
         [HttpPost]
         public IActionResult Authenticate(string username,string password)
         {
+            _logger.LogTrace("LogTrace log");
             Helpers.StatusResult<string> status = new Helpers.StatusResult<string>();
             var response = GenerateJwtToken(1,1, "admin");
             status.Message = "Login Successful";
@@ -42,6 +47,8 @@ namespace Portfolio.API.Controllers.V1
         }
         private string GenerateJwtToken(int UserId,int RoleId,string RoleName)
         {
+            _logger.LogDebug(1, "NLog injected into GenerateJwtToken");
+
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(/*_appSettings.SecretKey*/"c59af8dc897421c5b16fae2d4c27736c9be0aba0cdf105bbabdcccfc75412c17");
             var tokenDescriptor = new SecurityTokenDescriptor
