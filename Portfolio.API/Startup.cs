@@ -4,13 +4,18 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
 using Portfolio.API.Helpers;
+using Portfolio.Common;
+using Portfolio.Repository;
+using Portfolio.Repository.Movies.Queries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +36,28 @@ namespace Portfolio.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            //services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                options.SerializerSettings.ContractResolver =
+                    new Newtonsoft.Json.Serialization.DefaultContractResolver();
+            });
+
+            var connection = Configuration.GetConnectionString("DatabaseConnection");
+            services.AddDbContext<PortfolioDbContext>(options => options.UseSqlServer(connection));
+            services.Configure<AppSettings>(Configuration.GetSection("ApplicationSettings"));
+            services.Configure<ConnectionStrings>(Configuration.GetSection("ConnectionStrings"));
+
+            //services.AddTransient<IUserMasterQueries, UserMasterQueries>();
+            //services.AddTransient<IUserTokensQueries, UserTokensQueries>();
+            services.AddTransient<IMoviesQueries, MoviesQueries>();
+            services.AddTransient<IUnitOfWorkEntityFramework, UnitOfWorkEntityFramework>();
+            services.AddTransient<IUnitOfWorkDapper, UnitOfWorkDapper>();
+
+
+
             #region jwt authentication-start
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                .AddJwtBearer(options =>
