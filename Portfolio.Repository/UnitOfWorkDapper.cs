@@ -44,15 +44,15 @@ namespace Portfolio.Repository
             {
                 _transaction.Dispose();
                 _connection.Dispose();
-                ResetRepositories();
+                //ResetRepositories();
             }
             return returnValue;
         }
 
-        private void ResetRepositories()
+        /*private void ResetRepositories()
         {
             _customersCommand = null;
-        }
+        }*/
 
         public void Dispose()
         {
