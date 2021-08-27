@@ -22,5 +22,12 @@
     <Folder Include="Logs\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Portfolio.Common\Portfolio.Common.csproj" />
+    <ProjectReference Include="..\Portfolio.Entities\Portfolio.Entities.csproj" />
+    <ProjectReference Include="..\Portfolio.Repository\Portfolio.Repository.csproj" />
+    <ProjectReference Include="..\Portfolio.ViewModel\Portfolio.ViewModel.csproj" />
+  </ItemGroup>
+
 
 </Project>
