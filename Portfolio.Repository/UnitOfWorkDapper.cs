@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Portfolio.Repository.Customers.Command;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -12,7 +13,7 @@ namespace Portfolio.Repository
 
         private IDbConnection _connection;
         private IDbTransaction _transaction;
-        //private ICustomersCommand _customersCommand;
+        private ICustomersCommand _customersCommand;
         private bool _disposed;
         public UnitOfWorkDapper(IConfiguration configuration)
         {
@@ -20,13 +21,13 @@ namespace Portfolio.Repository
             _connection.Open();
             _transaction = _connection.BeginTransaction();
         }
-        /*public ICustomersCommand CustomersCommand
+        public ICustomersCommand CustomersCommand
         {
             get
             {
                 return _customersCommand = new CustomersCommand(_transaction, _connection);
             }
-        }*/
+        }
 
         public bool Commit()
         {
@@ -44,15 +45,15 @@ namespace Portfolio.Repository
             {
                 _transaction.Dispose();
                 _connection.Dispose();
-                //ResetRepositories();
+                ResetRepositories();
             }
             return returnValue;
         }
 
-        /*private void ResetRepositories()
+        private void ResetRepositories()
         {
             _customersCommand = null;
-        }*/
+        }
 
         public void Dispose()
         {

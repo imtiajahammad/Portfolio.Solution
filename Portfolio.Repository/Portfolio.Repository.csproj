@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -17,6 +17,10 @@
     <ProjectReference Include="..\Portfolio.Common\Portfolio.Common.csproj" />
     <ProjectReference Include="..\Portfolio.Entities\Portfolio.Entities.csproj" />
     <ProjectReference Include="..\Portfolio.ViewModel\Portfolio.ViewModel.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Customers\Queries\" />
   </ItemGroup>
 
 </Project>
